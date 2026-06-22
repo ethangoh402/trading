@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "trading-journal",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "public", "-p", "3001", "--no-clipboard"],
+      "port": 3001
+    }
+  ]
+}

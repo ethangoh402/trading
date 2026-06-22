@@ -1,0 +1,16 @@
+name = "trading-journal"
+account_id = "fdff0097f60d7401ec6f5305bcc0122b"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "trading-journal"
+database_id = "e9df5626-0916-4ed8-8286-f7e257c6e8a5"
+
+[[r2_buckets]]
+binding = "SCREENSHOTS"
+bucket_name = "trading-journal-screenshots"
+
+[ai]
+binding = "AI"

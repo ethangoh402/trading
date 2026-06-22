@@ -1,0 +1,12 @@
+{
+  "name": "trading-journal",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "wrangler": "^4.103.0"
+  },
+  "scripts": {
+    "dev": "wrangler pages dev public --d1=DB --r2=SCREENSHOTS",
+    "deploy": "wrangler pages deploy public"
+  }
+}
