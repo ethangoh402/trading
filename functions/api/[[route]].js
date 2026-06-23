@@ -47,7 +47,7 @@ async function handleSync(env) {
     const params = { productType: 'USDT-FUTURES', limit: '100' };
     if (endId) params.idLessThan = endId;
     const data = await bitgetFetch(env, 'GET', '/api/v2/mix/position/history-position', params);
-    if (data.code !== '00000') throw new Error(`Bitget: ${data.msg} (${data.code})`);
+    if (data.code !== '00000') throw new Error(`Bitget: ${data.msg} (${data.code}) — raw: ${JSON.stringify(data)}`);
     const list = data.data?.list || [];
     if (list.length === 0) break;
     list.forEach(p => {
