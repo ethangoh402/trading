@@ -389,7 +389,7 @@
       <table>
         <thead>
           <tr>
-            <th>PnL</th><th>Strategy</th><th>Rating</th><th>Entry</th><th>Exit</th><th>Lev</th><th>Date</th><th>Symbol</th><th>Side</th>
+            <th>PnL</th><th>ROE %</th><th>Strategy</th><th>Rating</th><th>Entry</th><th>Exit</th><th>Lev</th><th>Time</th><th>Symbol</th><th>Side</th>
           </tr>
         </thead>
         <tbody id="recentTradesBody"></tbody>
@@ -739,6 +739,18 @@ function fmtDate(ts) {
   return new Date(ts).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
 }
 
+function fmtTime(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12: true });
+}
+
+function fmtDateTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric' }) + ' · ' +
+         d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12: true });
+}
+
 function fmtPrice(v) {
   if (v == null) return '—';
   const n = parseFloat(v);
@@ -1046,14 +1058,17 @@ function renderRecentTrades() {
         const tr = document.createElement('tr');
         tr.className = 'clickable';
         tr.onclick = () => openModal(t.id);
+        const roe = calcRoe(t);
+        const roeHtml = roe !== null ? `<span class="${pnlClass(roe)}">${roe>0?'+':''}${roe.toFixed(1)}%</span>` : '<span style="color:var(--muted)">—</span>';
         tr.innerHTML = `
           <td class="${pnlClass(t.pnl)}">${fmtPnl(t.pnl)}</td>
+          <td>${roeHtml}</td>
           <td>${t.strategy||'<span style="color:var(--muted)">—</span>'}</td>
           <td>${t.rating ? starsHtml(t.rating) : '<span style="color:var(--muted)">—</span>'}</td>
           <td>${fmtPrice(t.entry_price)}</td>
           <td>${fmtPrice(t.exit_price)}</td>
           <td>${t.leverage ? t.leverage+'x' : '—'}</td>
-          <td style="color:var(--muted)">${fmtDate(t.close_time)}</td>
+          <td style="color:var(--muted)">${fmtDateTime(t.close_time)}</td>
           <td><strong>${t.symbol}</strong>${t.notes||t.entry_conditions?'<span class="has-journal-dot"></span>':''}</td>
           <td><span class="badge badge-${t.side==='long'?'long':'short'}">${t.side}</span></td>
         `;
@@ -1179,7 +1194,7 @@ function renderTradeTable(trades) {
       <td>${fmtPrice(t.entry_price)}</td>
       <td>${fmtPrice(t.exit_price)}</td>
       <td>${t.leverage ? t.leverage+'x' : '—'}</td>
-      <td style="color:var(--muted)">${fmtDate(t.close_time)}</td>
+      <td style="color:var(--muted)">${fmtDateTime(t.close_time)}</td>
       <td>${t.screenshot_key ? `<img class="thumb" src="${API_BASE}/api/screenshot/${encodeURIComponent(t.screenshot_key)}" alt="chart">` : '<span style="color:var(--muted)">—</span>'}</td>
       <td><strong>${t.symbol}</strong>${t.notes||t.entry_conditions?'<span class="has-journal-dot"></span>':''}</td>
       <td><span class="badge badge-${t.side==='long'?'long':'short'}">${t.side}</span></td>
@@ -1387,20 +1402,25 @@ function renderCalDetail(key) {
   const d = new Date(key+'T00:00:00');
   const label = d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   const el = document.getElementById('calDetail');
-  let rows = data.trades.map(t => `
-    <tr class="clickable" onclick="openModal('${t.id}')">
+  let rows = data.trades.map(t => {
+    const roe = calcRoe(t);
+    const roeHtml = roe !== null ? `<span class="${pnlClass(roe)}">${roe>0?'+':''}${roe.toFixed(1)}%</span>` : '<span style="color:var(--muted)">—</span>';
+    return `
+    <tr class="clickable" onclick="openModal('${t.id}')" title="Tap to open trade log">
       <td><strong>${t.symbol}</strong></td>
       <td><span class="badge badge-${t.side==='long'?'long':'short'}">${t.side}</span></td>
-      <td>${t.strategy||'—'}</td>
+      <td>${t.strategy||'<span style="color:var(--muted)">—</span>'}</td>
       <td class="${pnlClass(t.pnl)}">${fmtPnl(t.pnl)}</td>
-      <td>${fmtDate(t.close_time)}</td>
-    </tr>
-  `).join('');
+      <td>${roeHtml}</td>
+      <td style="color:var(--muted)">${fmtTime(t.close_time)}</td>
+      <td style="color:var(--blue);font-size:12px">View →</td>
+    </tr>`;
+  }).join('');
   el.innerHTML = `
     <div class="cal-detail">
       <div class="cal-detail-title">${label} — ${data.count} trade${data.count!==1?'s':''} · <span class="${pnlClass(data.pnl)}">${fmtPnl(parseFloat(data.pnl.toFixed(2)))}</span></div>
       <table>
-        <thead><tr><th>Symbol</th><th>Side</th><th>Strategy</th><th>PnL</th><th>Time</th></tr></thead>
+        <thead><tr><th>Symbol</th><th>Side</th><th>Strategy</th><th>PnL</th><th>ROE %</th><th>Time</th><th></th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
@@ -1508,13 +1528,16 @@ function openModal(id) {
   pnlEl.textContent = fmtPnl(t.pnl);
   pnlEl.className = 'modal-pnl ' + pnlClass(t.pnl);
 
+  const mRoe = calcRoe(t);
   document.getElementById('modalChips').innerHTML = `
     <div class="modal-chip">Entry: <span>${fmtPrice(t.entry_price)}</span></div>
     <div class="modal-chip">Exit: <span>${fmtPrice(t.exit_price)}</span></div>
     <div class="modal-chip">Lev: <span>${t.leverage ? t.leverage+'x' : '—'}</span></div>
+    <div class="modal-chip">ROE: <span class="${mRoe !== null ? pnlClass(mRoe) : ''}">${mRoe !== null ? (mRoe>0?'+':'')+mRoe.toFixed(2)+'%' : '—'}</span></div>
     <div class="modal-chip">Size: <span>${t.size || '—'}</span></div>
     <div class="modal-chip">Fee: <span class="neg">${t.fee ? '-$'+parseFloat(t.fee).toFixed(2) : '—'}</span></div>
     <div class="modal-chip">Closed: <span>${fmtDate(t.close_time)}</span></div>
+    <div class="modal-chip">Time: <span>${fmtTime(t.close_time)}</span></div>
   `;
 
   // Setup panel
