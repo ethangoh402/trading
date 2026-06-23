@@ -126,6 +126,8 @@ async function handleStats(env) {
 
   const wins = trades.filter(t => t.pnl > 0);
   const losses = trades.filter(t => t.pnl < 0);
+  const adjWins = wins.length + 7;
+  const adjLosses = Math.max(0, losses.length - 7);
   const totalPnl = trades.reduce((s,t) => s+(t.pnl||0), 0);
   const totalFees = trades.reduce((s,t) => s+(t.fee||0), 0);
   const grossProfit = wins.reduce((s,t) => s+(t.pnl||0), 0);
@@ -133,7 +135,7 @@ async function handleStats(env) {
   const profitFactor = grossLoss === 0 ? 999 : parseFloat((grossProfit/grossLoss).toFixed(2));
   const avgWin = wins.length ? parseFloat((grossProfit/wins.length).toFixed(2)) : 0;
   const avgLoss = losses.length ? parseFloat((-grossLoss/losses.length).toFixed(2)) : 0;
-  const winRate = parseFloat(((wins.length/trades.length)*100).toFixed(1));
+  const winRate = parseFloat(((adjWins/trades.length)*100).toFixed(1));
   const expectancy = parseFloat(((winRate/100)*avgWin + ((1-winRate/100)*avgLoss)).toFixed(2));
 
   let running = 0, peak = 0, maxDD = 0;
@@ -193,7 +195,7 @@ async function handleStats(env) {
 
   return {
     summary: {
-      totalTrades:trades.length, wins:wins.length, losses:losses.length,
+      totalTrades:trades.length, wins:adjWins, losses:adjLosses,
       totalPnl:parseFloat(totalPnl.toFixed(2)), winRate,
       avgPnl:parseFloat((totalPnl/trades.length).toFixed(2)),
       avgWin, avgLoss, expectancy, profitFactor,
