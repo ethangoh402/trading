@@ -277,12 +277,41 @@
     }
 
     /* Dashboard redesign */
-    .dash-greeting { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; }
-    .dash-greeting-text { font-size:22px; font-weight:700; margin-bottom:4px; }
-    .dash-greeting-date { font-size:13px; color:var(--muted); }
-    .dash-top-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
-    .dash-mid-row { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:20px; }
-    .dash-content-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+    .dash-greet-bar { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; }
+    .dash-greet-text { font-size:22px; font-weight:700; margin-bottom:4px; }
+    .dash-greet-date { font-size:13px; color:var(--muted); }
+    .dash-top-grid { display:grid; grid-template-columns:130px 210px 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+    .dash-col1 { display:flex; flex-direction:column; gap:8px; }
+    .dash-count-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; flex:1; }
+    .dash-count-num { font-size:26px; font-weight:800; margin-top:4px; font-variant-numeric:tabular-nums; }
+    .dash-chart-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; }
+    .dash-mini-chart { flex:1; min-height:80px; position:relative; margin-top:8px; }
+    .dash-stats-row { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:20px; }
+    .dash-bottom-grid { display:grid; grid-template-columns:320px 1fr; gap:16px; margin-bottom:16px; }
+    .dash-trade-item { display:flex; align-items:center; justify-content:space-between; padding:10px 6px; border-bottom:1px solid var(--border); cursor:pointer; transition:all 0.1s; border-radius:6px; margin:0 -6px; }
+    .dash-trade-item:last-child { border-bottom:none; }
+    .dash-trade-item:hover { background:var(--surface2); }
+    .dash-trade-left { display:flex; align-items:center; gap:10px; }
+    .dash-trade-symbol { font-size:14px; font-weight:700; }
+    .dash-trade-badge { font-size:10px; font-weight:700; text-transform:uppercase; padding:2px 6px; border-radius:3px; }
+    .dash-trade-badge.long { background:rgba(0,212,160,0.15); color:var(--green); }
+    .dash-trade-badge.short { background:rgba(255,71,87,0.15); color:var(--red); }
+    .dash-trade-right { text-align:right; }
+    .dash-trade-pnl { font-size:14px; font-weight:700; }
+    .dash-trade-date { font-size:11px; color:var(--muted); margin-top:2px; }
+    .dash-cal-full-dow-row { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:4px; }
+    .dash-cal-full-dow { text-align:center; font-size:11px; font-weight:600; color:var(--muted); padding:4px 0; }
+    .dash-cal-full-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+    .dash-cal-full-cell { min-height:56px; background:var(--surface2); border:1px solid transparent; border-radius:6px; padding:6px; cursor:default; transition:all 0.1s; }
+    .dash-cal-full-cell.empty { background:transparent; border-color:transparent; }
+    .dash-cal-full-cell.has-trades { cursor:pointer; }
+    .dash-cal-full-cell.has-trades:hover { border-color:var(--muted); }
+    .dash-cal-full-cell.profit { background:rgba(0,212,160,0.12); border-color:rgba(0,212,160,0.2); }
+    .dash-cal-full-cell.loss { background:rgba(255,71,87,0.1); border-color:rgba(255,71,87,0.15); }
+    .dash-cal-full-cell.today { border-color:var(--blue) !important; }
+    .dash-cal-full-num { font-size:11px; font-weight:600; color:var(--muted); }
+    .dash-cal-full-pnl { font-size:11px; font-weight:700; margin-top:3px; }
+    .dash-cal-full-count { font-size:10px; color:var(--muted); margin-top:1px; }
     .ls-row { display:flex; align-items:center; gap:6px; margin-top:5px; }
     .ls-label { font-size:11px; min-width:34px; }
     .ls-bar { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
@@ -291,19 +320,9 @@
     .dash-cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
     .dash-cal-nav { background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; padding:0 6px; line-height:1; border-radius:4px; }
     .dash-cal-nav:hover { color:var(--text); }
-    .dash-cal-dow-row { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:2px; }
-    .dash-cal-dow { text-align:center; font-size:9px; color:var(--muted); font-weight:600; padding:2px 0; }
-    .dash-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
-    .dash-cal-cell { aspect-ratio:1; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; background:var(--surface2); border:1px solid transparent; cursor:default; transition:all 0.1s; color:var(--muted); }
-    .dash-cal-cell.empty { background:transparent; }
-    .dash-cal-cell.has-trades { cursor:pointer; }
-    .dash-cal-cell.has-trades:hover { border-color:var(--text); }
-    .dash-cal-cell.profit { background:rgba(0,212,160,0.2); color:var(--green); }
-    .dash-cal-cell.loss { background:rgba(255,71,87,0.15); color:var(--red); }
-    .dash-cal-cell.today { border-color:var(--blue) !important; }
-    @media (max-width:900px) { .dash-top-row { grid-template-columns:1fr 1fr; } .dash-mid-row { grid-template-columns:repeat(3,1fr); } }
-    @media (max-width:768px) { .dash-mid-row { grid-template-columns:repeat(3,1fr); } .dash-content-row { grid-template-columns:1fr; } }
-    @media (max-width:600px) { .dash-mid-row { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:1100px) { .dash-top-grid { grid-template-columns:1fr 1fr 1fr; } }
+    @media (max-width:900px) { .dash-top-grid { grid-template-columns:1fr 1fr; } .dash-stats-row { grid-template-columns:repeat(3,1fr); } .dash-bottom-grid { grid-template-columns:1fr; } }
+    @media (max-width:600px) { .dash-stats-row { grid-template-columns:repeat(2,1fr); } }
 
     /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -340,53 +359,60 @@
   <div class="section active" id="sec-dashboard">
 
     <!-- Greeting -->
-    <div class="dash-greeting">
+    <div class="dash-greet-bar">
       <div>
-        <div class="dash-greeting-text" id="greetingText">—</div>
-        <div class="dash-greeting-date" id="greetingDate">—</div>
+        <div class="dash-greet-text" id="greetingText">—</div>
+        <div class="dash-greet-date" id="greetingDate">—</div>
       </div>
-      <div class="sync-time" id="syncTime"></div>
     </div>
 
-    <!-- Top row: Earnings · Daily · Drawdown · Avg Win -->
-    <div class="dash-top-row">
-      <div class="stat-card primary-pnl">
-        <div class="stat-label">Earnings</div>
-        <div class="stat-value large" id="s-totalPnl">—</div>
-        <div class="stat-sub" id="s-pnlSub">loading...</div>
+    <!-- 5-column top grid -->
+    <div class="dash-top-grid">
+      <!-- Open + Total trades -->
+      <div class="dash-col1">
+        <div class="dash-count-card">
+          <div class="stat-label">Open Trades</div>
+          <div class="dash-count-num">0</div>
+        </div>
+        <div class="dash-count-card">
+          <div class="stat-label">Total Trades</div>
+          <div class="dash-count-num" id="s-trades">—</div>
+          <div class="stat-sub" id="s-tradesSub">—W · —L</div>
+        </div>
       </div>
-      <div class="stat-card">
+      <!-- Earnings + Long/Short -->
+      <div class="stat-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+        <div>
+          <div class="stat-label">Earnings</div>
+          <div class="stat-value large" id="s-totalPnl">—</div>
+          <div class="stat-sub" id="s-pnlSub">—</div>
+        </div>
+        <div id="s-lsRatio" style="margin-top:8px">—</div>
+      </div>
+      <!-- Cumulative mini chart -->
+      <div class="dash-chart-card">
+        <div class="stat-label">Cumulative Earnings</div>
+        <div class="dash-mini-chart"><canvas id="miniEquityChart"></canvas></div>
+      </div>
+      <!-- Daily mini chart -->
+      <div class="dash-chart-card">
         <div class="stat-label">Daily Earnings</div>
-        <div class="stat-value" id="s-dailyPnl">—</div>
-        <div class="stat-sub" id="s-dailySub">Today</div>
+        <div class="dash-mini-chart"><canvas id="miniDailyChart"></canvas></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Max Drawdown</div>
-        <div class="stat-value neg" id="s-maxDD">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Avg Win / Loss</div>
-        <div class="stat-value pos" id="s-avgWin">—</div>
-        <div class="stat-sub neg" id="s-avgLoss">—</div>
+      <!-- Drawdown mini chart -->
+      <div class="dash-chart-card">
+        <div class="stat-label">Drawdown</div>
+        <div class="dash-mini-chart"><canvas id="miniDrawdownChart"></canvas></div>
       </div>
     </div>
 
-    <!-- Mid row: Trades · Win Rate · Long/Short · Profit Factor · Expectancy · Fees -->
-    <div class="dash-mid-row">
-      <div class="stat-card">
-        <div class="stat-label">Total Trades</div>
-        <div class="stat-value" id="s-trades">—</div>
-        <div class="stat-sub" id="s-tradesSub">—W · —L</div>
-      </div>
+    <!-- Stats row -->
+    <div class="dash-stats-row">
       <div class="stat-card">
         <div class="stat-label">Win Rate</div>
         <div class="stat-value" id="s-winRate">—</div>
         <div class="progress-bar-wrap"><div class="progress-bar-fill" id="s-winBar" style="width:0%"></div></div>
         <div class="stat-sub" id="s-wlSub">— W · — L</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Long / Short</div>
-        <div id="s-lsRatio" style="margin-top:4px">—</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Profit Factor</div>
@@ -399,53 +425,41 @@
         <div class="stat-sub">Per trade avg</div>
       </div>
       <div class="stat-card">
+        <div class="stat-label">Avg Win / Loss</div>
+        <div class="stat-value pos" id="s-avgWin">—</div>
+        <div class="stat-sub neg" id="s-avgLoss">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Max Drawdown</div>
+        <div class="stat-value neg" id="s-maxDD">—</div>
+      </div>
+      <div class="stat-card">
         <div class="stat-label">Total Fees</div>
         <div class="stat-value neg" id="s-fees">—</div>
         <div class="stat-sub" id="s-streakSub">Streak: —</div>
       </div>
     </div>
 
-    <!-- Content row: Recent Trades + Mini Calendar -->
-    <div class="dash-content-row">
-      <div class="table-wrap">
-        <div class="table-header"><span class="table-title">Recent Trades</span></div>
-        <table>
-          <thead><tr><th>PnL</th><th>ROE</th><th>Symbol</th><th>Side</th><th>Time</th></tr></thead>
-          <tbody id="recentTradesBody"></tbody>
-        </table>
+    <!-- Bottom: Recent Trades list + Full Calendar -->
+    <div class="dash-bottom-grid">
+      <div class="chart-card">
+        <div class="chart-title" style="margin-bottom:12px">Recent Trades</div>
+        <div id="recentTradesBody"></div>
       </div>
-      <div class="chart-card" style="padding:16px 20px;">
+      <div class="chart-card">
         <div class="dash-cal-header">
           <div class="chart-title" id="dashCalLabel">—</div>
-          <div style="display:flex;gap:4px;">
+          <div style="display:flex;gap:4px;align-items:center;">
             <button class="dash-cal-nav" onclick="dashCalNav(-1)">‹</button>
             <button class="dash-cal-nav" onclick="dashCalNav(1)">›</button>
           </div>
         </div>
-        <div class="dash-cal-dow-row">
-          <div class="dash-cal-dow">S</div><div class="dash-cal-dow">M</div><div class="dash-cal-dow">T</div>
-          <div class="dash-cal-dow">W</div><div class="dash-cal-dow">T</div><div class="dash-cal-dow">F</div><div class="dash-cal-dow">S</div>
+        <div class="dash-cal-full-dow-row">
+          <div class="dash-cal-full-dow">Sun</div><div class="dash-cal-full-dow">Mon</div><div class="dash-cal-full-dow">Tue</div>
+          <div class="dash-cal-full-dow">Wed</div><div class="dash-cal-full-dow">Thu</div><div class="dash-cal-full-dow">Fri</div><div class="dash-cal-full-dow">Sat</div>
         </div>
-        <div class="dash-cal-grid" id="dashCalGrid"></div>
+        <div class="dash-cal-full-grid" id="dashCalGrid"></div>
       </div>
-    </div>
-
-    <!-- Equity chart -->
-    <div class="chart-card" style="margin-bottom:16px;">
-      <div class="chart-header">
-        <div class="chart-title">Equity Curve</div>
-        <button class="chart-save-btn" onclick="saveChartPng('equity','equity-curve')">⤓ Save PNG</button>
-      </div>
-      <div class="chart-wrap"><canvas id="equityChart" height="240"></canvas></div>
-    </div>
-
-    <!-- Drawdown chart -->
-    <div class="chart-card">
-      <div class="chart-header">
-        <div class="chart-title">Drawdown</div>
-        <button class="chart-save-btn" onclick="saveChartPng('drawdown','drawdown')">⤓ Save PNG</button>
-      </div>
-      <div class="chart-wrap"><canvas id="drawdownChart" height="140"></canvas></div>
     </div>
 
     <!-- hidden elements kept for JS compat -->
@@ -944,21 +958,12 @@ async function loadStats() {
     stats = d;
     renderGreeting();
     renderStats(d.summary);
-    renderEquity(d.equity);
-    renderDrawdown(d.drawdown);
+    renderMiniEquityChart(d.equity);
+    renderMiniDailyChart(d.equity);
+    renderMiniDrawdownChart(d.drawdown);
     renderRecentTrades();
-    // Daily PnL
-    const today = todayStr();
-    const todayPnl = (d.equity||[]).filter(e => {
-      if (!e.time) return false;
-      const dt = new Date(e.time);
-      return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}` === today;
-    }).reduce((s, e) => s + (e.tradePnl||0), 0);
-    const dpEl = document.getElementById('s-dailyPnl');
-    if (dpEl) { dpEl.textContent = fmtPnl(todayPnl); dpEl.className = 'stat-value ' + pnlClass(todayPnl); }
-    // Mini calendar
     await fetchCalendarData();
-    renderDashCalendar();
+    renderDashFullCalendar();
   } catch(e) { toast('Failed to load stats: '+e.message, 'error'); }
 }
 
@@ -1119,27 +1124,109 @@ function renderDrawdown(drawdown) {
   });
 }
 
+function renderMiniEquityChart(equity) {
+  if (!equity || equity.length === 0) return;
+  const canvas = document.getElementById('miniEquityChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (charts.miniEquity) charts.miniEquity.destroy();
+  const values = equity.map(e => e.cumPnl);
+  const isPos = values[values.length-1] >= 0;
+  const color = isPos ? '#00d4a0' : '#ff4757';
+  charts.miniEquity = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: equity.map((_,i) => i),
+      datasets: [{ data: values, borderColor: color, borderWidth: 1.5, pointRadius: 0, fill: true,
+        backgroundColor: isPos ? 'rgba(0,212,160,0.15)' : 'rgba(255,71,87,0.15)', tension: 0.3 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+}
+
+function renderMiniDailyChart(equity) {
+  if (!equity || equity.length === 0) return;
+  const canvas = document.getElementById('miniDailyChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (charts.miniDaily) charts.miniDaily.destroy();
+  const byDay = {};
+  equity.forEach(e => {
+    if (!e.time) return;
+    const d = new Date(e.time);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    byDay[key] = (byDay[key] || 0) + (e.tradePnl || 0);
+  });
+  const keys = Object.keys(byDay).sort();
+  const values = keys.map(k => byDay[k]);
+  charts.miniDaily = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: keys,
+      datasets: [{ data: values, backgroundColor: values.map(v => v >= 0 ? 'rgba(0,212,160,0.7)' : 'rgba(255,71,87,0.7)'), borderRadius: 2 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+}
+
+function renderMiniDrawdownChart(drawdown) {
+  if (!drawdown || drawdown.length === 0) return;
+  const canvas = document.getElementById('miniDrawdownChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (charts.miniDrawdown) charts.miniDrawdown.destroy();
+  const values = drawdown.map(e => e.dd);
+  charts.miniDrawdown = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: drawdown.map((_,i) => i),
+      datasets: [{ data: values, borderColor: '#ff4757', borderWidth: 1.5, pointRadius: 0, fill: true,
+        backgroundColor: 'rgba(255,71,87,0.15)', tension: 0.2 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+}
+
 function renderRecentTrades() {
-  const tbody = document.getElementById('recentTradesBody');
-  tbody.innerHTML = '';
-  fetch(API_BASE+'/api/trades?limit=10&offset=0')
+  const container = document.getElementById('recentTradesBody');
+  container.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px 0">Loading...</div>';
+  fetch(API_BASE+'/api/trades?limit=15&offset=0')
     .then(r=>r.json())
     .then(d => {
-      (d.trades||[]).forEach(t => {
+      container.innerHTML = '';
+      const trades = d.trades || [];
+      if (!trades.length) {
+        container.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:24px 0">No trades yet</div>';
+        return;
+      }
+      trades.forEach(t => {
         tradesCache[t.id] = t;
-        const roe = calcRoe(t);
-        const roeHtml = roe !== null ? `<span class="${pnlClass(roe)}">${roe>0?'+':''}${roe.toFixed(1)}%</span>` : '<span style="color:var(--muted)">—</span>';
-        const tr = document.createElement('tr');
-        tr.className = 'clickable';
-        tr.onclick = () => openModal(t.id);
-        tr.innerHTML = `
-          <td class="${pnlClass(t.pnl)}">${fmtPnl(t.pnl)}</td>
-          <td>${roeHtml}</td>
-          <td><strong>${t.symbol}</strong>${t.notes||t.entry_conditions?'<span class="has-journal-dot"></span>':''}</td>
-          <td><span class="badge badge-${t.side==='long'?'long':'short'}">${t.side}</span></td>
-          <td style="color:var(--muted);font-size:12px">${fmtTime(t.close_time)}</td>
+        const div = document.createElement('div');
+        div.className = 'dash-trade-item';
+        div.onclick = () => openModal(t.id);
+        div.innerHTML = `
+          <div class="dash-trade-left">
+            <span class="dash-trade-symbol">${t.symbol}</span>
+            <span class="dash-trade-badge ${t.side==='long'?'long':'short'}">${t.side}</span>
+          </div>
+          <div class="dash-trade-right">
+            <div class="dash-trade-pnl ${pnlClass(t.pnl)}">${fmtPnl(t.pnl)}</div>
+            <div class="dash-trade-date">${fmtDateTime(t.close_time)}</div>
+          </div>
         `;
-        tbody.appendChild(tr);
+        container.appendChild(div);
       });
     });
 }
@@ -1153,7 +1240,7 @@ function renderGreeting() {
   if (de) de.textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
 }
 
-function renderDashCalendar() {
+function renderDashFullCalendar() {
   if (!dashCalYear) { const n = new Date(); dashCalYear = n.getFullYear(); dashCalMonth = n.getMonth(); }
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const lbl = document.getElementById('dashCalLabel');
@@ -1164,23 +1251,24 @@ function renderDashCalendar() {
   const firstDay = new Date(dashCalYear, dashCalMonth, 1).getDay();
   const daysInMonth = new Date(dashCalYear, dashCalMonth+1, 0).getDate();
   const today = todayStr();
-  for (let i=0; i<firstDay; i++) { const c=document.createElement('div'); c.className='dash-cal-cell empty'; grid.appendChild(c); }
+  for (let i=0; i<firstDay; i++) { const c=document.createElement('div'); c.className='dash-cal-full-cell empty'; grid.appendChild(c); }
   for (let day=1; day<=daysInMonth; day++) {
     const key = `${dashCalYear}-${String(dashCalMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const data = calData[key];
     const c = document.createElement('div');
-    let cls = 'dash-cal-cell';
+    let cls = 'dash-cal-full-cell';
     if (key === today) cls += ' today';
     if (data) {
       cls += ' has-trades ' + (data.pnl >= 0 ? 'profit' : 'loss');
-      c.title = `${data.count} trade${data.count!==1?'s':''} · ${fmtPnl(parseFloat(data.pnl.toFixed(2)))}`;
       c.onclick = () => {
         const calBtn = [...document.querySelectorAll('.nav-tab')].find(b => b.getAttribute('onclick')?.includes("'calendar'"));
         if (calBtn) { selectedCalDay=key; calYear=dashCalYear; calMonth=dashCalMonth; showTab('calendar', calBtn); }
       };
+      c.innerHTML = `<div class="dash-cal-full-num">${day}</div><div class="dash-cal-full-pnl ${pnlClass(data.pnl)}">${fmtPnl(parseFloat(data.pnl.toFixed(2)))}</div><div class="dash-cal-full-count">${data.count}t</div>`;
+    } else {
+      c.innerHTML = `<div class="dash-cal-full-num">${day}</div>`;
     }
     c.className = cls;
-    c.textContent = day;
     grid.appendChild(c);
   }
 }
@@ -1190,7 +1278,7 @@ function dashCalNav(dir) {
   dashCalMonth += dir;
   if (dashCalMonth < 0) { dashCalMonth=11; dashCalYear--; }
   if (dashCalMonth > 11) { dashCalMonth=0; dashCalYear++; }
-  renderDashCalendar();
+  renderDashFullCalendar();
 }
 
 // ── Trade Log ──────────────────────────────────────────────────────────────────
