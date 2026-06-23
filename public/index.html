@@ -44,7 +44,7 @@
     /* Stats grid */
     .stats-primary { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .stats-secondary { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 24px; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.45); }
     .stat-card.primary-pnl { display: flex; flex-direction: column; justify-content: center; }
     .stat-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
     .stat-value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -56,7 +56,7 @@
     .progress-bar-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.5s; }
 
     /* Charts */
-    .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; }
+    .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 2px 16px rgba(0,0,0,0.45); }
     .chart-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
     .chart-wrap { position: relative; }
 
@@ -282,9 +282,9 @@
     .dash-greet-date { font-size:13px; color:var(--muted); }
     .dash-top-grid { display:grid; grid-template-columns:130px 210px 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
     .dash-col1 { display:flex; flex-direction:column; gap:8px; }
-    .dash-count-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; flex:1; }
+    .dash-count-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; flex:1; box-shadow:0 2px 16px rgba(0,0,0,0.45); }
     .dash-count-num { font-size:26px; font-weight:800; margin-top:4px; font-variant-numeric:tabular-nums; }
-    .dash-chart-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; }
+    .dash-chart-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; box-shadow:0 2px 16px rgba(0,0,0,0.45); }
     .dash-mini-chart { flex:1; min-height:80px; position:relative; margin-top:8px; }
     .dash-stats-row { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:20px; }
     .dash-bottom-grid { display:grid; grid-template-columns:320px 1fr; gap:16px; margin-bottom:16px; }
@@ -298,7 +298,9 @@
     .dash-trade-badge.short { background:rgba(255,71,87,0.15); color:var(--red); }
     .dash-trade-right { text-align:right; }
     .dash-trade-pnl { font-size:14px; font-weight:700; }
-    .dash-trade-date { font-size:11px; color:var(--muted); margin-top:2px; }
+    .dash-trade-date { font-size:11px; color:var(--muted); }
+    .dash-trade-meta { display:flex; align-items:center; gap:6px; margin-top:3px; }
+    .dash-trade-roe { font-size:11px; font-weight:600; margin-top:2px; }
     .dash-cal-full-dow-row { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:4px; }
     .dash-cal-full-dow { text-align:center; font-size:11px; font-weight:600; color:var(--muted); padding:4px 0; }
     .dash-cal-full-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
@@ -323,6 +325,13 @@
     @media (max-width:1100px) { .dash-top-grid { grid-template-columns:1fr 1fr 1fr; } }
     @media (max-width:900px) { .dash-top-grid { grid-template-columns:1fr 1fr; } .dash-stats-row { grid-template-columns:repeat(3,1fr); } .dash-bottom-grid { grid-template-columns:1fr; } }
     @media (max-width:600px) { .dash-stats-row { grid-template-columns:repeat(2,1fr); } }
+
+    /* Calendar monthly summary */
+    .cal-month-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 20px; box-shadow:0 2px 16px rgba(0,0,0,0.45); }
+    .cal-month-summary-item { text-align:center; }
+    .cal-month-summary-val { font-size:18px; font-weight:800; margin-top:3px; font-variant-numeric:tabular-nums; }
+    .cal-day.profit { background:rgba(0,212,160,0.1); border-color:rgba(0,212,160,0.3); }
+    .cal-day.loss { background:rgba(255,71,87,0.08); border-color:rgba(255,71,87,0.25); }
 
     /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -454,6 +463,7 @@
             <button class="dash-cal-nav" onclick="dashCalNav(1)">›</button>
           </div>
         </div>
+        <div id="dashCalSummary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;"></div>
         <div class="dash-cal-full-dow-row">
           <div class="dash-cal-full-dow">Sun</div><div class="dash-cal-full-dow">Mon</div><div class="dash-cal-full-dow">Tue</div>
           <div class="dash-cal-full-dow">Wed</div><div class="dash-cal-full-dow">Thu</div><div class="dash-cal-full-dow">Fri</div><div class="dash-cal-full-dow">Sat</div>
@@ -515,7 +525,7 @@
       <table>
         <thead>
           <tr>
-            <th>PnL</th><th>ROE %</th><th>Strategy</th><th>Rating</th><th>Entry</th><th>Exit</th><th>Lev</th><th>Date</th><th>Chart</th><th>Symbol</th><th>Side</th>
+            <th>PnL</th><th>ROE %</th><th>Strategy</th><th>Rating</th><th>Date</th><th>Chart</th><th>Symbol</th><th>Side</th>
           </tr>
         </thead>
         <tbody id="tradeLogBody"></tbody>
@@ -558,6 +568,7 @@
       <div class="cal-month-label" id="calMonthLabel">—</div>
       <button class="btn btn-ghost btn-sm" onclick="calNav(1)">Next →</button>
     </div>
+    <div id="calSummary" class="cal-month-summary" style="display:none"></div>
     <div class="cal-grid-header">
       <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
       <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div><div class="cal-dow">Sat</div>
@@ -1213,17 +1224,24 @@ function renderRecentTrades() {
       }
       trades.forEach(t => {
         tradesCache[t.id] = t;
+        const roe = calcRoe(t);
+        const roeStr = roe !== null ? `<span class="dash-trade-roe ${pnlClass(roe)}">${roe>0?'+':''}${roe.toFixed(1)}%</span>` : '';
         const div = document.createElement('div');
         div.className = 'dash-trade-item';
         div.onclick = () => openModal(t.id);
         div.innerHTML = `
           <div class="dash-trade-left">
-            <span class="dash-trade-symbol">${t.symbol}</span>
-            <span class="dash-trade-badge ${t.side==='long'?'long':'short'}">${t.side}</span>
+            <div>
+              <div class="dash-trade-symbol">${t.symbol}</div>
+              <div class="dash-trade-meta">
+                <span class="dash-trade-badge ${t.side==='long'?'long':'short'}">${t.side}</span>
+                <span class="dash-trade-date">${fmtDateTime(t.close_time)}</span>
+              </div>
+            </div>
           </div>
           <div class="dash-trade-right">
             <div class="dash-trade-pnl ${pnlClass(t.pnl)}">${fmtPnl(t.pnl)}</div>
-            <div class="dash-trade-date">${fmtDateTime(t.close_time)}</div>
+            ${roeStr}
           </div>
         `;
         container.appendChild(div);
@@ -1245,6 +1263,24 @@ function renderDashFullCalendar() {
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const lbl = document.getElementById('dashCalLabel');
   if (lbl) lbl.textContent = `${monthNames[dashCalMonth]} ${dashCalYear}`;
+
+  // Monthly stats
+  const mKeys = Object.keys(calData).filter(k => {
+    const d = new Date(k+'T00:00:00');
+    return d.getFullYear() === dashCalYear && d.getMonth() === dashCalMonth;
+  });
+  const mPnl = mKeys.reduce((s,k) => s + calData[k].pnl, 0);
+  const mTrades = mKeys.reduce((s,k) => s + calData[k].count, 0);
+  const mWinDays = mKeys.filter(k => calData[k].pnl >= 0).length;
+  const mWinRate = mKeys.length ? Math.round((mWinDays/mKeys.length)*100) : 0;
+  const summaryEl = document.getElementById('dashCalSummary');
+  if (summaryEl) summaryEl.innerHTML = `
+    <div style="text-align:center"><div class="stat-label">Monthly PnL</div><div style="font-size:15px;font-weight:800;margin-top:2px" class="${pnlClass(mPnl)}">${fmtPnl(parseFloat(mPnl.toFixed(2)))}</div></div>
+    <div style="text-align:center"><div class="stat-label">Win Days</div><div style="font-size:15px;font-weight:700;margin-top:2px">${mWinRate}%</div></div>
+    <div style="text-align:center"><div class="stat-label">Trade Days</div><div style="font-size:15px;font-weight:700;margin-top:2px">${mKeys.length}</div></div>
+    <div style="text-align:center"><div class="stat-label">Positions</div><div style="font-size:15px;font-weight:700;margin-top:2px">${mTrades}</div></div>
+  `;
+
   const grid = document.getElementById('dashCalGrid');
   if (!grid) return;
   grid.innerHTML = '';
@@ -1395,9 +1431,6 @@ function renderTradeTable(trades) {
       <td>${roeHtml}</td>
       <td>${t.strategy||'<span style="color:var(--muted)">—</span>'}</td>
       <td>${t.rating ? starsHtml(t.rating) : '<span style="color:var(--muted)">—</span>'}</td>
-      <td>${fmtPrice(t.entry_price)}</td>
-      <td>${fmtPrice(t.exit_price)}</td>
-      <td>${t.leverage ? t.leverage+'x' : '—'}</td>
       <td style="color:var(--muted)">${fmtDateTime(t.close_time)}</td>
       <td>${t.screenshot_key ? `<img class="thumb" src="${API_BASE}/api/screenshot/${encodeURIComponent(t.screenshot_key)}" alt="chart">` : '<span style="color:var(--muted)">—</span>'}</td>
       <td><strong>${t.symbol}</strong>${t.notes||t.entry_conditions?'<span class="has-journal-dot"></span>':''}</td>
@@ -1407,7 +1440,7 @@ function renderTradeTable(trades) {
   });
   if (trades.length === 0) {
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td colspan="11" style="text-align:center;color:var(--muted);padding:32px">No trades found</td>`;
+    tr.innerHTML = `<td colspan="8" style="text-align:center;color:var(--muted);padding:32px">No trades found</td>`;
     tbody.appendChild(tr);
   }
 }
@@ -1551,6 +1584,26 @@ function renderCalendar() {
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('calMonthLabel').textContent = `${monthNames[calMonth]} ${calYear}`;
 
+  // Monthly summary
+  const mKeys = Object.keys(calData).filter(k => {
+    const d = new Date(k+'T00:00:00');
+    return d.getFullYear() === calYear && d.getMonth() === calMonth;
+  });
+  const mPnl = mKeys.reduce((s,k) => s + calData[k].pnl, 0);
+  const mTrades = mKeys.reduce((s,k) => s + calData[k].count, 0);
+  const mWinDays = mKeys.filter(k => calData[k].pnl >= 0).length;
+  const mWinRate = mKeys.length ? Math.round((mWinDays/mKeys.length)*100) : 0;
+  const sumEl = document.getElementById('calSummary');
+  if (sumEl) {
+    sumEl.style.display = mKeys.length ? 'grid' : 'none';
+    sumEl.innerHTML = `
+      <div class="cal-month-summary-item"><div class="stat-label">Monthly PnL</div><div class="cal-month-summary-val ${pnlClass(mPnl)}">${fmtPnl(parseFloat(mPnl.toFixed(2)))}</div></div>
+      <div class="cal-month-summary-item"><div class="stat-label">Win Days</div><div class="cal-month-summary-val">${mWinRate}%</div></div>
+      <div class="cal-month-summary-item"><div class="stat-label">Trade Days</div><div class="cal-month-summary-val">${mKeys.length}</div></div>
+      <div class="cal-month-summary-item"><div class="stat-label">Positions</div><div class="cal-month-summary-val">${mTrades}</div></div>
+    `;
+  }
+
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '';
 
@@ -1569,13 +1622,15 @@ function renderCalendar() {
     const key = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const data = calData[key];
     const d = document.createElement('div');
-    d.className = 'cal-day' + (key===today?' today':'') + (key===selectedCalDay?' selected':'');
+    let cls = 'cal-day' + (key===today?' today':'') + (key===selectedCalDay?' selected':'');
+    if (data) cls += data.pnl >= 0 ? ' profit' : ' loss';
     let inner = `<div class="cal-day-num">${day}</div>`;
     if (data) {
       inner += `<div class="cal-day-pnl ${pnlClass(data.pnl)}">${fmtPnl(parseFloat(data.pnl.toFixed(2)))}</div>`;
       inner += `<div class="cal-day-count">${data.count} trade${data.count!==1?'s':''}</div>`;
       d.onclick = () => selectCalDay(key);
     }
+    d.className = cls;
     d.innerHTML = inner;
     grid.appendChild(d);
   }
