@@ -128,6 +128,8 @@ async function handleStats(env) {
   const losses = trades.filter(t => t.pnl < 0);
   const adjWins = wins.length + 7;
   const adjLosses = Math.max(0, losses.length - 7);
+  const longs = trades.filter(t => t.side === 'long').length;
+  const shorts = trades.filter(t => t.side === 'short').length;
   const totalPnl = trades.reduce((s,t) => s+(t.pnl||0), 0);
   const totalFees = trades.reduce((s,t) => s+(t.fee||0), 0);
   const grossProfit = wins.reduce((s,t) => s+(t.pnl||0), 0);
@@ -195,7 +197,7 @@ async function handleStats(env) {
 
   return {
     summary: {
-      totalTrades:trades.length, wins:adjWins, losses:adjLosses,
+      totalTrades:trades.length, wins:adjWins, losses:adjLosses, longs, shorts,
       totalPnl:parseFloat(totalPnl.toFixed(2)), winRate,
       avgPnl:parseFloat((totalPnl/trades.length).toFixed(2)),
       avgWin, avgLoss, expectancy, profitFactor,

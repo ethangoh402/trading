@@ -276,6 +276,35 @@
       .modal-chip { font-size: 11px; padding: 3px 8px; }
     }
 
+    /* Dashboard redesign */
+    .dash-greeting { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; }
+    .dash-greeting-text { font-size:22px; font-weight:700; margin-bottom:4px; }
+    .dash-greeting-date { font-size:13px; color:var(--muted); }
+    .dash-top-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
+    .dash-mid-row { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:20px; }
+    .dash-content-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+    .ls-row { display:flex; align-items:center; gap:6px; margin-top:5px; }
+    .ls-label { font-size:11px; min-width:34px; }
+    .ls-bar { flex:1; height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
+    .ls-bar-fill { height:100%; border-radius:3px; }
+    .ls-count { font-size:11px; font-weight:600; min-width:52px; text-align:right; }
+    .dash-cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+    .dash-cal-nav { background:none; border:none; color:var(--muted); cursor:pointer; font-size:18px; padding:0 6px; line-height:1; border-radius:4px; }
+    .dash-cal-nav:hover { color:var(--text); }
+    .dash-cal-dow-row { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:2px; }
+    .dash-cal-dow { text-align:center; font-size:9px; color:var(--muted); font-weight:600; padding:2px 0; }
+    .dash-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+    .dash-cal-cell { aspect-ratio:1; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; background:var(--surface2); border:1px solid transparent; cursor:default; transition:all 0.1s; color:var(--muted); }
+    .dash-cal-cell.empty { background:transparent; }
+    .dash-cal-cell.has-trades { cursor:pointer; }
+    .dash-cal-cell.has-trades:hover { border-color:var(--text); }
+    .dash-cal-cell.profit { background:rgba(0,212,160,0.2); color:var(--green); }
+    .dash-cal-cell.loss { background:rgba(255,71,87,0.15); color:var(--red); }
+    .dash-cal-cell.today { border-color:var(--blue) !important; }
+    @media (max-width:900px) { .dash-top-row { grid-template-columns:1fr 1fr; } .dash-mid-row { grid-template-columns:repeat(3,1fr); } }
+    @media (max-width:768px) { .dash-mid-row { grid-template-columns:repeat(3,1fr); } .dash-content-row { grid-template-columns:1fr; } }
+    @media (max-width:600px) { .dash-mid-row { grid-template-columns:repeat(2,1fr); } }
+
     /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -309,18 +338,55 @@
 
   <!-- DASHBOARD -->
   <div class="section active" id="sec-dashboard">
-    <!-- Primary stats -->
-    <div class="stats-primary">
+
+    <!-- Greeting -->
+    <div class="dash-greeting">
+      <div>
+        <div class="dash-greeting-text" id="greetingText">—</div>
+        <div class="dash-greeting-date" id="greetingDate">—</div>
+      </div>
+      <div class="sync-time" id="syncTime"></div>
+    </div>
+
+    <!-- Top row: Earnings · Daily · Drawdown · Avg Win -->
+    <div class="dash-top-row">
       <div class="stat-card primary-pnl">
-        <div class="stat-label">Total PnL</div>
+        <div class="stat-label">Earnings</div>
         <div class="stat-value large" id="s-totalPnl">—</div>
         <div class="stat-sub" id="s-pnlSub">loading...</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Daily Earnings</div>
+        <div class="stat-value" id="s-dailyPnl">—</div>
+        <div class="stat-sub" id="s-dailySub">Today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Max Drawdown</div>
+        <div class="stat-value neg" id="s-maxDD">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Win / Loss</div>
+        <div class="stat-value pos" id="s-avgWin">—</div>
+        <div class="stat-sub neg" id="s-avgLoss">—</div>
+      </div>
+    </div>
+
+    <!-- Mid row: Trades · Win Rate · Long/Short · Profit Factor · Expectancy · Fees -->
+    <div class="dash-mid-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Trades</div>
+        <div class="stat-value" id="s-trades">—</div>
+        <div class="stat-sub" id="s-tradesSub">—W · —L</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Win Rate</div>
         <div class="stat-value" id="s-winRate">—</div>
         <div class="progress-bar-wrap"><div class="progress-bar-fill" id="s-winBar" style="width:0%"></div></div>
         <div class="stat-sub" id="s-wlSub">— W · — L</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Long / Short</div>
+        <div id="s-lsRatio" style="margin-top:4px">—</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Profit Factor</div>
@@ -332,39 +398,40 @@
         <div class="stat-value" id="s-expectancy">—</div>
         <div class="stat-sub">Per trade avg</div>
       </div>
-    </div>
-    <!-- Secondary stats -->
-    <div class="stats-secondary">
-      <div class="stat-card">
-        <div class="stat-label">Trades</div>
-        <div class="stat-value" id="s-trades">—</div>
-        <div class="stat-sub" id="s-tradesSub">—W · —L</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Avg Win</div>
-        <div class="stat-value pos" id="s-avgWin">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Avg Loss</div>
-        <div class="stat-value neg" id="s-avgLoss">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Max Drawdown</div>
-        <div class="stat-value neg" id="s-maxDD">—</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Current Streak</div>
-        <div class="stat-value" id="s-streak">—</div>
-        <div class="stat-sub" id="s-streakSub">Best: — / Worst: —</div>
-      </div>
       <div class="stat-card">
         <div class="stat-label">Total Fees</div>
         <div class="stat-value neg" id="s-fees">—</div>
+        <div class="stat-sub" id="s-streakSub">Streak: —</div>
+      </div>
+    </div>
+
+    <!-- Content row: Recent Trades + Mini Calendar -->
+    <div class="dash-content-row">
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">Recent Trades</span></div>
+        <table>
+          <thead><tr><th>PnL</th><th>ROE</th><th>Symbol</th><th>Side</th><th>Time</th></tr></thead>
+          <tbody id="recentTradesBody"></tbody>
+        </table>
+      </div>
+      <div class="chart-card" style="padding:16px 20px;">
+        <div class="dash-cal-header">
+          <div class="chart-title" id="dashCalLabel">—</div>
+          <div style="display:flex;gap:4px;">
+            <button class="dash-cal-nav" onclick="dashCalNav(-1)">‹</button>
+            <button class="dash-cal-nav" onclick="dashCalNav(1)">›</button>
+          </div>
+        </div>
+        <div class="dash-cal-dow-row">
+          <div class="dash-cal-dow">S</div><div class="dash-cal-dow">M</div><div class="dash-cal-dow">T</div>
+          <div class="dash-cal-dow">W</div><div class="dash-cal-dow">T</div><div class="dash-cal-dow">F</div><div class="dash-cal-dow">S</div>
+        </div>
+        <div class="dash-cal-grid" id="dashCalGrid"></div>
       </div>
     </div>
 
     <!-- Equity chart -->
-    <div class="chart-card">
+    <div class="chart-card" style="margin-bottom:16px;">
       <div class="chart-header">
         <div class="chart-title">Equity Curve</div>
         <button class="chart-save-btn" onclick="saveChartPng('equity','equity-curve')">⤓ Save PNG</button>
@@ -381,20 +448,9 @@
       <div class="chart-wrap"><canvas id="drawdownChart" height="140"></canvas></div>
     </div>
 
-    <!-- Recent Trades -->
-    <div class="table-wrap">
-      <div class="table-header">
-        <span class="table-title">Recent Trades</span>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>PnL</th><th>ROE %</th><th>Strategy</th><th>Rating</th><th>Entry</th><th>Exit</th><th>Lev</th><th>Time</th><th>Symbol</th><th>Side</th>
-          </tr>
-        </thead>
-        <tbody id="recentTradesBody"></tbody>
-      </table>
-    </div>
+    <!-- hidden elements kept for JS compat -->
+    <span id="s-streak" style="display:none"></span>
+
   </div>
 
   <!-- TRADE LOG -->
@@ -693,6 +749,7 @@ let tradesCache = {};
 let calYear, calMonth;
 let calData = {};
 let selectedCalDay = null;
+let dashCalYear = null, dashCalMonth = null;
 let journalDate = todayStr();
 let journalMood = null;
 let journals = [];
@@ -885,46 +942,63 @@ async function loadStats() {
     const d = await r.json();
     if (d.error) throw new Error(d.error);
     stats = d;
+    renderGreeting();
     renderStats(d.summary);
     renderEquity(d.equity);
     renderDrawdown(d.drawdown);
     renderRecentTrades();
+    // Daily PnL
+    const today = todayStr();
+    const todayPnl = (d.equity||[]).filter(e => {
+      if (!e.time) return false;
+      const dt = new Date(e.time);
+      return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}` === today;
+    }).reduce((s, e) => s + (e.tradePnl||0), 0);
+    const dpEl = document.getElementById('s-dailyPnl');
+    if (dpEl) { dpEl.textContent = fmtPnl(todayPnl); dpEl.className = 'stat-value ' + pnlClass(todayPnl); }
+    // Mini calendar
+    await fetchCalendarData();
+    renderDashCalendar();
   } catch(e) { toast('Failed to load stats: '+e.message, 'error'); }
 }
 
 function renderStats(s) {
   const set = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  const totalPnlEl = document.getElementById('s-totalPnl');
-  totalPnlEl.textContent = fmtPnl(s.totalPnl);
-  totalPnlEl.className = 'stat-value large ' + pnlClass(s.totalPnl);
+  const el = id => document.getElementById(id);
 
+  const pnlEl = el('s-totalPnl');
+  if(pnlEl) { pnlEl.textContent = fmtPnl(s.totalPnl); pnlEl.className = 'stat-value large ' + pnlClass(s.totalPnl); }
   set('s-pnlSub', `Best: ${fmtPnl(s.best)} · Worst: ${fmtPnl(s.worst)}`);
-  document.getElementById('s-winRate').textContent = s.totalTrades ? s.winRate+'%' : '—';
-  document.getElementById('s-winBar').style.width = s.winRate+'%';
+
+  const wrEl = el('s-winRate'); if(wrEl) wrEl.textContent = s.totalTrades ? s.winRate+'%' : '—';
+  const wbEl = el('s-winBar'); if(wbEl) wbEl.style.width = s.winRate+'%';
   set('s-wlSub', `${s.wins}W · ${s.losses}L`);
 
-  const pf = document.getElementById('s-profitFactor');
-  pf.textContent = s.profitFactor === 999 ? '∞' : s.profitFactor;
-  pf.className = 'stat-value ' + (s.profitFactor >= 1 ? 'pos' : 'neg');
+  const pf = el('s-profitFactor');
+  if(pf) { pf.textContent = s.profitFactor === 999 ? '∞' : s.profitFactor; pf.className = 'stat-value ' + (s.profitFactor >= 1 ? 'pos' : 'neg'); }
 
-  const exp = document.getElementById('s-expectancy');
-  exp.textContent = s.totalTrades ? fmtPnl(s.expectancy) : '—';
-  exp.className = 'stat-value ' + pnlClass(s.expectancy);
+  const exp = el('s-expectancy');
+  if(exp) { exp.textContent = s.totalTrades ? fmtPnl(s.expectancy) : '—'; exp.className = 'stat-value ' + pnlClass(s.expectancy); }
 
   set('s-trades', s.totalTrades);
   set('s-tradesSub', `${s.wins}W · ${s.losses}L`);
 
-  document.getElementById('s-avgWin').textContent = fmtPnl(s.avgWin);
-  document.getElementById('s-avgLoss').textContent = fmtPnl(s.avgLoss);
-  document.getElementById('s-maxDD').textContent = s.maxDrawdown ? `-$${s.maxDrawdown.toFixed(2)}` : '$0.00';
+  const aw = el('s-avgWin'); if(aw) aw.textContent = fmtPnl(s.avgWin);
+  const al = el('s-avgLoss'); if(al) al.textContent = fmtPnl(s.avgLoss);
+  const md = el('s-maxDD'); if(md) md.textContent = s.maxDrawdown ? `-$${s.maxDrawdown.toFixed(2)}` : '$0.00';
+  const fe = el('s-fees'); if(fe) fe.textContent = s.totalFees ? `-$${s.totalFees.toFixed(2)}` : '$0.00';
+  set('s-streakSub', `Streak: ${s.currentStreak||0} ${s.currentStreakType==='win'?'W':s.currentStreakType==='loss'?'L':''} · Best W: ${s.bestWinStreak}`);
 
-  const streakEl = document.getElementById('s-streak');
-  if (s.currentStreak && s.currentStreakType) {
-    streakEl.textContent = `${s.currentStreak} ${s.currentStreakType === 'win' ? '🟢' : '🔴'}`;
-    streakEl.className = 'stat-value ' + (s.currentStreakType === 'win' ? 'pos' : 'neg');
-  } else { streakEl.textContent = '—'; }
-  set('s-streakSub', `Best: ${s.bestWinStreak} / Worst: ${s.worstLossStreak}`);
-  document.getElementById('s-fees').textContent = s.totalFees ? `-$${s.totalFees.toFixed(2)}` : '$0.00';
+  // Long/Short ratio
+  const lsEl = el('s-lsRatio');
+  if(lsEl && s.longs !== undefined) {
+    const total = (s.longs||0) + (s.shorts||0);
+    const lp = total ? Math.round((s.longs/total)*100) : 50;
+    const sp = 100 - lp;
+    lsEl.innerHTML = `
+      <div class="ls-row"><span class="ls-label pos">Long</span><div class="ls-bar"><div class="ls-bar-fill" style="width:${lp}%;background:var(--green)"></div></div><span class="ls-count pos">${s.longs} (${lp}%)</span></div>
+      <div class="ls-row"><span class="ls-label neg">Short</span><div class="ls-bar"><div class="ls-bar-fill" style="width:${sp}%;background:var(--red)"></div></div><span class="ls-count neg">${s.shorts} (${sp}%)</span></div>`;
+  }
 }
 
 function renderEquity(equity) {
@@ -1046,35 +1120,77 @@ function renderDrawdown(drawdown) {
 }
 
 function renderRecentTrades() {
-  if (!stats || !stats.equity) return;
   const tbody = document.getElementById('recentTradesBody');
   tbody.innerHTML = '';
-  // Load recent trades
   fetch(API_BASE+'/api/trades?limit=10&offset=0')
     .then(r=>r.json())
     .then(d => {
       (d.trades||[]).forEach(t => {
         tradesCache[t.id] = t;
+        const roe = calcRoe(t);
+        const roeHtml = roe !== null ? `<span class="${pnlClass(roe)}">${roe>0?'+':''}${roe.toFixed(1)}%</span>` : '<span style="color:var(--muted)">—</span>';
         const tr = document.createElement('tr');
         tr.className = 'clickable';
         tr.onclick = () => openModal(t.id);
-        const roe = calcRoe(t);
-        const roeHtml = roe !== null ? `<span class="${pnlClass(roe)}">${roe>0?'+':''}${roe.toFixed(1)}%</span>` : '<span style="color:var(--muted)">—</span>';
         tr.innerHTML = `
           <td class="${pnlClass(t.pnl)}">${fmtPnl(t.pnl)}</td>
           <td>${roeHtml}</td>
-          <td>${t.strategy||'<span style="color:var(--muted)">—</span>'}</td>
-          <td>${t.rating ? starsHtml(t.rating) : '<span style="color:var(--muted)">—</span>'}</td>
-          <td>${fmtPrice(t.entry_price)}</td>
-          <td>${fmtPrice(t.exit_price)}</td>
-          <td>${t.leverage ? t.leverage+'x' : '—'}</td>
-          <td style="color:var(--muted)">${fmtDateTime(t.close_time)}</td>
           <td><strong>${t.symbol}</strong>${t.notes||t.entry_conditions?'<span class="has-journal-dot"></span>':''}</td>
           <td><span class="badge badge-${t.side==='long'?'long':'short'}">${t.side}</span></td>
+          <td style="color:var(--muted);font-size:12px">${fmtTime(t.close_time)}</td>
         `;
         tbody.appendChild(tr);
       });
     });
+}
+
+function renderGreeting() {
+  const h = new Date().getHours();
+  const greeting = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  const el = document.getElementById('greetingText');
+  if (el) el.textContent = greeting + '!';
+  const de = document.getElementById('greetingDate');
+  if (de) de.textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+}
+
+function renderDashCalendar() {
+  if (!dashCalYear) { const n = new Date(); dashCalYear = n.getFullYear(); dashCalMonth = n.getMonth(); }
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const lbl = document.getElementById('dashCalLabel');
+  if (lbl) lbl.textContent = `${monthNames[dashCalMonth]} ${dashCalYear}`;
+  const grid = document.getElementById('dashCalGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const firstDay = new Date(dashCalYear, dashCalMonth, 1).getDay();
+  const daysInMonth = new Date(dashCalYear, dashCalMonth+1, 0).getDate();
+  const today = todayStr();
+  for (let i=0; i<firstDay; i++) { const c=document.createElement('div'); c.className='dash-cal-cell empty'; grid.appendChild(c); }
+  for (let day=1; day<=daysInMonth; day++) {
+    const key = `${dashCalYear}-${String(dashCalMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const data = calData[key];
+    const c = document.createElement('div');
+    let cls = 'dash-cal-cell';
+    if (key === today) cls += ' today';
+    if (data) {
+      cls += ' has-trades ' + (data.pnl >= 0 ? 'profit' : 'loss');
+      c.title = `${data.count} trade${data.count!==1?'s':''} · ${fmtPnl(parseFloat(data.pnl.toFixed(2)))}`;
+      c.onclick = () => {
+        const calBtn = [...document.querySelectorAll('.nav-tab')].find(b => b.getAttribute('onclick')?.includes("'calendar'"));
+        if (calBtn) { selectedCalDay=key; calYear=dashCalYear; calMonth=dashCalMonth; showTab('calendar', calBtn); }
+      };
+    }
+    c.className = cls;
+    c.textContent = day;
+    grid.appendChild(c);
+  }
+}
+
+function dashCalNav(dir) {
+  if (!dashCalYear) { const n=new Date(); dashCalYear=n.getFullYear(); dashCalMonth=n.getMonth(); }
+  dashCalMonth += dir;
+  if (dashCalMonth < 0) { dashCalMonth=11; dashCalYear--; }
+  if (dashCalMonth > 11) { dashCalMonth=0; dashCalYear++; }
+  renderDashCalendar();
 }
 
 // ── Trade Log ──────────────────────────────────────────────────────────────────
