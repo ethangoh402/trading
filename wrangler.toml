@@ -1,5 +1,4 @@
 name = "trading-journal"
-account_id = "fdff0097f60d7401ec6f5305bcc0122b"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "public"
 
