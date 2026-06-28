@@ -278,6 +278,8 @@
 
     /* Dashboard redesign */
     .dash-greet-bar { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; }
+    .dash-balance-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 20px; box-shadow:0 2px 16px rgba(0,0,0,0.45); min-width:180px; text-align:right; }
+    .dash-balance-val { font-size:24px; font-weight:800; font-variant-numeric:tabular-nums; margin-top:4px; }
     .dash-greet-text { font-size:22px; font-weight:700; margin-bottom:4px; }
     .dash-greet-date { font-size:13px; color:var(--muted); }
     .dash-top-grid { display:grid; grid-template-columns:130px 210px 1fr 1fr 1fr; gap:12px; margin-bottom:12px; }
@@ -372,6 +374,11 @@
       <div>
         <div class="dash-greet-text" id="greetingText">—</div>
         <div class="dash-greet-date" id="greetingDate">—</div>
+      </div>
+      <div class="dash-balance-card" id="balanceCard">
+        <div class="stat-label">Account Balance</div>
+        <div class="dash-balance-val" id="balanceVal">—</div>
+        <div class="stat-sub" id="balanceSub">—</div>
       </div>
     </div>
 
@@ -976,6 +983,30 @@ async function loadStats() {
     await fetchCalendarData();
     renderDashFullCalendar();
   } catch(e) { toast('Failed to load stats: '+e.message, 'error'); }
+  loadBalance();
+}
+
+async function loadBalance() {
+  try {
+    const r = await fetch(API_BASE+'/api/balance');
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    const valEl = document.getElementById('balanceVal');
+    const subEl = document.getElementById('balanceSub');
+    if (valEl) {
+      valEl.textContent = '$' + d.equity.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      valEl.className = 'dash-balance-val';
+    }
+    if (subEl) {
+      const unr = d.unrealized;
+      const sign = unr >= 0 ? '+' : '';
+      subEl.innerHTML = `Avail: <span style="color:var(--text);font-weight:600">$${d.balance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>` +
+        (unr !== 0 ? ` · UPnL: <span class="${unr>=0?'pos':'neg'}">${sign}${unr.toFixed(2)}</span>` : '');
+    }
+  } catch(e) {
+    const subEl = document.getElementById('balanceSub');
+    if (subEl) subEl.textContent = 'unavailable';
+  }
 }
 
 function renderStats(s) {

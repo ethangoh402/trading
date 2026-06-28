@@ -283,6 +283,26 @@ async function handleScreenshot(env, key) {
   return new Response(obj.body, { headers: { 'Content-Type': obj.httpMetadata?.contentType || 'image/png' } });
 }
 
+async function handleBalance(env) {
+  const apiKey = cleanEnv(env.BITGET_API_KEY);
+  const apiSecret = cleanEnv(env.BITGET_API_SECRET);
+  const passphrase = cleanEnv(env.BITGET_PASSPHRASE);
+  if (!apiKey || !apiSecret || !passphrase) {
+    throw new Error('Bitget credentials missing');
+  }
+  const data = await bitgetFetch(env, 'GET', '/api/v2/mix/account/accounts', { productType: 'USDT-FUTURES' });
+  if (!data || typeof data !== 'object') throw new Error('Bitget returned unexpected response');
+  if (data.code !== '00000') throw new Error(`Bitget API error: ${data.msg || '(no message)'} [code ${data.code || '?'}]`);
+  const accounts = data.data || [];
+  const usdt = accounts.find(a => a.marginCoin === 'USDT') || accounts[0] || {};
+  return {
+    balance: parseFloat(usdt.available || usdt.accountEquity || 0),
+    equity: parseFloat(usdt.accountEquity || usdt.available || 0),
+    unrealized: parseFloat(usdt.unrealizedPL || 0),
+    margin: parseFloat(usdt.crossedMarginLeverage || usdt.fixedMargin || 0),
+  };
+}
+
 async function handleGetJournals(env) {
   const { results } = await env.DB.prepare('SELECT * FROM daily_journals ORDER BY date DESC').all();
   return { journals: results };
@@ -300,6 +320,7 @@ export async function onRequest(context) {
   if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
   const route = (params.route || []).join('/');
   try {
+    if (route === 'balance' && request.method === 'GET') return json(await handleBalance(env));
     if (route === 'sync' && request.method === 'POST') return json(await handleSync(env));
     if (route === 'import' && request.method === 'POST') return json(await handleImport(env, request));
     if (route === 'trades' && request.method === 'GET') return json(await handleGetTrades(env, request));
