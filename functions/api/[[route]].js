@@ -41,13 +41,25 @@ async function bitgetFetch(env, method, path, queryParams = {}) {
 }
 
 async function handleSync(env) {
+  const apiKey = cleanEnv(env.BITGET_API_KEY);
+  const apiSecret = cleanEnv(env.BITGET_API_SECRET);
+  const passphrase = cleanEnv(env.BITGET_PASSPHRASE);
+  if (!apiKey || !apiSecret || !passphrase) {
+    throw new Error('Bitget credentials missing — set BITGET_API_KEY, BITGET_API_SECRET, BITGET_PASSPHRASE in Cloudflare Pages → Settings → Environment variables');
+  }
   const trades = [];
   let endId = null;
   while (true) {
     const params = { productType: 'USDT-FUTURES', limit: '100' };
     if (endId) params.idLessThan = endId;
-    const data = await bitgetFetch(env, 'GET', '/api/v2/mix/position/history-position', params);
-    if (data.code !== '00000') throw new Error(`Bitget: ${data.msg} (${data.code}) — raw: ${JSON.stringify(data)}`);
+    let data;
+    try {
+      data = await bitgetFetch(env, 'GET', '/api/v2/mix/position/history-position', params);
+    } catch (fetchErr) {
+      throw new Error(`Bitget network error: ${fetchErr.message}`);
+    }
+    if (!data || typeof data !== 'object') throw new Error(`Bitget returned unexpected response (not JSON)`);
+    if (data.code !== '00000') throw new Error(`Bitget API error: ${data.msg || '(no message)'} [code ${data.code || '?'}] — ${JSON.stringify(data)}`);
     const list = data.data?.list || [];
     if (list.length === 0) break;
     list.forEach(p => {
