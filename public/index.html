@@ -405,6 +405,7 @@
   <div class="header-right">
     <span class="sync-time" id="syncTime"></span>
     <button class="btn btn-ghost btn-sm" onclick="syncTrades()">⟳ Sync Bitget</button>
+    <button class="btn btn-ghost btn-sm" onclick="openSettings()" title="Settings" style="padding:5px 9px;font-size:15px;">⚙</button>
   </div>
 </div>
 
@@ -805,6 +806,43 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveTradeDetail()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()" style="z-index:1100;">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <div class="modal-title-row">
+        <div class="modal-title">⚙ Bitget API Settings</div>
+        <button class="modal-close" onclick="closeSettings()">×</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6;">
+        Credentials are stored securely in your database — they survive redeployments and never need to be re-entered in Cloudflare.
+      </div>
+    </div>
+    <div class="modal-body">
+      <div id="settingsStatus" style="margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+      <div class="form-group">
+        <label class="form-label">API Key</label>
+        <input class="form-input" id="set-apiKey" type="password" placeholder="bg_xxxxxxxxxxxx" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">API Secret</label>
+        <input class="form-input" id="set-apiSecret" type="password" placeholder="Leave blank to keep existing" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Passphrase</label>
+        <input class="form-input" id="set-passphrase" type="password" placeholder="Leave blank to keep existing" autocomplete="off">
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;background:var(--surface2);border-radius:8px;padding:10px 12px;border:1px solid var(--border);">
+        In Bitget → API Management, create a key with <strong style="color:var(--text)">Read Only</strong> permissions for Futures. Leave a field blank to keep the currently saved value.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeSettings()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Credentials</button>
     </div>
   </div>
 </div>
@@ -1926,6 +1964,54 @@ function openModal(id) {
   switchModalTab('setup', document.querySelector('.modal-tab'));
   document.getElementById('modalOverlay').classList.add('open');
 }
+
+// ── Settings ───────────────────────────────────────────────────────────────────
+
+async function openSettings() {
+  document.getElementById('settingsOverlay').classList.add('open');
+  document.getElementById('set-apiKey').value = '';
+  document.getElementById('set-apiSecret').value = '';
+  document.getElementById('set-passphrase').value = '';
+  const statusEl = document.getElementById('settingsStatus');
+  statusEl.innerHTML = '<div style="color:var(--muted);font-size:12px;grid-column:span 3">Checking saved credentials…</div>';
+  try {
+    const r = await fetch(API_BASE + '/api/settings');
+    const d = await r.json();
+    const badge = (label, ok) =>
+      `<div style="background:${ok?'rgba(0,212,160,0.1)':'rgba(255,71,87,0.08)'};border:1px solid ${ok?'rgba(0,212,160,0.3)':'rgba(255,71,87,0.25)'};border-radius:8px;padding:8px;text-align:center;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">${label}</div>
+        <div style="font-size:16px">${ok?'✓':'✗'}</div>
+      </div>`;
+    statusEl.innerHTML = badge('API Key', d.api_key_set) + badge('Secret', d.secret_set) + badge('Passphrase', d.passphrase_set);
+  } catch(e) {
+    statusEl.innerHTML = '<div style="color:var(--muted);font-size:12px;grid-column:span 3">Could not check status</div>';
+  }
+}
+
+function closeSettings() {
+  document.getElementById('settingsOverlay').classList.remove('open');
+}
+
+async function saveSettings() {
+  const body = {};
+  const key = document.getElementById('set-apiKey').value.trim();
+  const secret = document.getElementById('set-apiSecret').value.trim();
+  const pass = document.getElementById('set-passphrase').value.trim();
+  if (key) body.BITGET_API_KEY = key;
+  if (secret) body.BITGET_API_SECRET = secret;
+  if (pass) body.BITGET_PASSPHRASE = pass;
+  if (!Object.keys(body).length) { toast('Nothing to save — fill in at least one field', 'error'); return; }
+  try {
+    const r = await fetch(API_BASE + '/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    toast(`Saved ${d.saved} credential(s) to database`, 'success');
+    closeSettings();
+    loadBalance();
+  } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+}
+
+// ── Trade Modal ─────────────────────────────────────────────────────────────────
 
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('open');

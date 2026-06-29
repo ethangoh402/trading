@@ -21,10 +21,34 @@ function cleanEnv(s) {
   return (s || '').replace(/^[﻿​ \s]+|[\s]+$/g, '');
 }
 
+async function ensureSettingsTable(env) {
+  await env.DB.prepare(
+    `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at INTEGER DEFAULT (unixepoch()))`
+  ).run();
+}
+
+async function getCredentials(env) {
+  let apiKey = cleanEnv(env.BITGET_API_KEY);
+  let apiSecret = cleanEnv(env.BITGET_API_SECRET);
+  let passphrase = cleanEnv(env.BITGET_PASSPHRASE);
+  if (!apiKey || !apiSecret || !passphrase) {
+    try {
+      await ensureSettingsTable(env);
+      const { results } = await env.DB.prepare(
+        `SELECT key, value FROM settings WHERE key IN ('BITGET_API_KEY','BITGET_API_SECRET','BITGET_PASSPHRASE')`
+      ).all();
+      const map = {};
+      results.forEach(r => { map[r.key] = r.value; });
+      if (!apiKey) apiKey = cleanEnv(map['BITGET_API_KEY'] || '');
+      if (!apiSecret) apiSecret = cleanEnv(map['BITGET_API_SECRET'] || '');
+      if (!passphrase) passphrase = cleanEnv(map['BITGET_PASSPHRASE'] || '');
+    } catch(_) {}
+  }
+  return { apiKey, apiSecret, passphrase };
+}
+
 async function bitgetFetch(env, method, path, queryParams = {}) {
-  const apiKey = cleanEnv(env.BITGET_API_KEY);
-  const apiSecret = cleanEnv(env.BITGET_API_SECRET);
-  const passphrase = cleanEnv(env.BITGET_PASSPHRASE);
+  const { apiKey, apiSecret, passphrase } = await getCredentials(env);
   const query = new URLSearchParams(queryParams).toString();
   const timestamp = Date.now().toString();
   const prehash = timestamp + method.toUpperCase() + path + (query ? `?${query}` : '');
@@ -41,11 +65,9 @@ async function bitgetFetch(env, method, path, queryParams = {}) {
 }
 
 async function handleSync(env) {
-  const apiKey = cleanEnv(env.BITGET_API_KEY);
-  const apiSecret = cleanEnv(env.BITGET_API_SECRET);
-  const passphrase = cleanEnv(env.BITGET_PASSPHRASE);
+  const { apiKey, apiSecret, passphrase } = await getCredentials(env);
   if (!apiKey || !apiSecret || !passphrase) {
-    throw new Error('Bitget credentials missing — set BITGET_API_KEY, BITGET_API_SECRET, BITGET_PASSPHRASE in Cloudflare Pages → Settings → Environment variables');
+    throw new Error('Bitget credentials not configured — open Settings (⚙) in the app and enter your API Key, Secret, and Passphrase');
   }
   const trades = [];
   let endId = null;
@@ -284,11 +306,9 @@ async function handleScreenshot(env, key) {
 }
 
 async function handleBalance(env) {
-  const apiKey = cleanEnv(env.BITGET_API_KEY);
-  const apiSecret = cleanEnv(env.BITGET_API_SECRET);
-  const passphrase = cleanEnv(env.BITGET_PASSPHRASE);
+  const { apiKey, apiSecret, passphrase } = await getCredentials(env);
   if (!apiKey || !apiSecret || !passphrase) {
-    throw new Error('Bitget credentials missing');
+    throw new Error('Bitget credentials not configured');
   }
   const data = await bitgetFetch(env, 'GET', '/api/v2/mix/account/accounts', { productType: 'USDT-FUTURES' });
   if (!data || typeof data !== 'object') throw new Error('Bitget returned unexpected response');
@@ -301,6 +321,32 @@ async function handleBalance(env) {
     unrealized: parseFloat(usdt.unrealizedPL || 0),
     margin: parseFloat(usdt.crossedMarginLeverage || usdt.fixedMargin || 0),
   };
+}
+
+async function handleGetSettings(env) {
+  await ensureSettingsTable(env);
+  const { results } = await env.DB.prepare(
+    `SELECT key FROM settings WHERE key IN ('BITGET_API_KEY','BITGET_API_SECRET','BITGET_PASSPHRASE')`
+  ).all();
+  const set = new Set(results.map(r => r.key));
+  return {
+    api_key_set: set.has('BITGET_API_KEY'),
+    secret_set: set.has('BITGET_API_SECRET'),
+    passphrase_set: set.has('BITGET_PASSPHRASE'),
+  };
+}
+
+async function handleSaveSettings(env, request) {
+  await ensureSettingsTable(env);
+  const body = await request.json();
+  const allowed = ['BITGET_API_KEY', 'BITGET_API_SECRET', 'BITGET_PASSPHRASE'];
+  const stmt = env.DB.prepare(`INSERT OR REPLACE INTO settings (key, value, updated_at) VALUES (?, ?, unixepoch())`);
+  const ops = [];
+  allowed.forEach(k => {
+    if (body[k] !== undefined && body[k] !== '') ops.push(stmt.bind(k, String(body[k])));
+  });
+  if (ops.length) await env.DB.batch(ops);
+  return { success: true, saved: ops.length };
 }
 
 async function handleGetJournals(env) {
@@ -321,6 +367,8 @@ export async function onRequest(context) {
   const route = (params.route || []).join('/');
   try {
     if (route === 'balance' && request.method === 'GET') return json(await handleBalance(env));
+    if (route === 'settings' && request.method === 'GET') return json(await handleGetSettings(env));
+    if (route === 'settings' && request.method === 'POST') return json(await handleSaveSettings(env, request));
     if (route === 'sync' && request.method === 'POST') return json(await handleSync(env));
     if (route === 'import' && request.method === 'POST') return json(await handleImport(env, request));
     if (route === 'trades' && request.method === 'GET') return json(await handleGetTrades(env, request));

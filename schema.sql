@@ -1,3 +1,9 @@
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at INTEGER DEFAULT (unixepoch())
+);
+
 CREATE TABLE IF NOT EXISTS trades (
   id TEXT PRIMARY KEY,
   symbol TEXT NOT NULL,
